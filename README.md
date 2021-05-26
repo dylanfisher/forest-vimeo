@@ -10,6 +10,16 @@ The Vimeo [personal access token](https://developer.vimeo.com/apps/215549#person
 
 `forest_vimeo_access_token: abcdef12345` or override with `ENV['FOREST_VIMEO_ACCESS_TOKEN']`
 
+Override `MediaItem` class and include the `Forest::Vimeo::MediaItemExtension` concern in your host app:
+
+```ruby
+# app/models/media_item.rb
+class MediaItem < Forest::ApplicationRecord
+  include BaseMediaItem
+  include Forest::Vimeo::MediaItemExtension
+end
+```
+
 ## Installation
 Add this line to your application's Gemfile:
 

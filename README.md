@@ -4,6 +4,12 @@ Enable an application running Forest to sync video uploads to Vimeo.
 ## Usage
 This plugin requires at minimum a Vimeo pro account to enable direct video file access.
 
+Add the following key/values to your Rails credentials file, or specify an environment variable to override.
+
+The Vimeo [personal access token](https://developer.vimeo.com/apps/215549#personal_access_tokens)
+
+`forest_vimeo_access_token: abcdef12345` or override with `ENV['FOREST_VIMEO_ACCESS_TOKEN']`
+
 ## Installation
 Add this line to your application's Gemfile:
 

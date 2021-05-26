@@ -47,6 +47,3 @@ test/dummy/tmp/
 local_env.yml
 
 /config/credentials/development.key
-
-/public/storefront/schema.json
-/public/forest/shopify/storefront/schema.json

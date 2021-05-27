@@ -12,23 +12,23 @@ module Forest::Vimeo
     end
 
     def vimeo_video_id
-      vimeo_metadata && ['uri']&.match(/^\/videos\/(\d*)/).try(:[], 1)
+      vimeo_metadata && vimeo_metadata['uri']&.match(/^\/videos\/(\d*)/).try(:[], 1)
     end
 
     def vimeo_user_id
-      vimeo_metadata.dig('user', 'uri')&.match(/^\/users\/(\d*)/).try(:[], 1)
+      vimeo_metadata&.dig('user', 'uri')&.match(/^\/users\/(\d*)/).try(:[], 1)
     end
 
     def vimeo_video_link
-      vimeo_metadata['link']
+      vimeo_metadata && vimeo_metadata['link']
     end
 
     def vimeo_video_width
-      vimeo_metadata['width']
+      vimeo_metadata && vimeo_metadata['width']
     end
 
     def vimeo_video_height
-      vimeo_metadata['height']
+      vimeo_metadata && vimeo_metadata['height']
     end
 
     def vimeo_video_aspect_ratio(vimeo_video_default_width: 16, vimeo_video_default_height: 9)
@@ -38,14 +38,16 @@ module Forest::Vimeo
     end
 
     def vimeo_video_upload_status
-      vimeo_metadata.dig('upload', 'status')
+      vimeo_metadata&.dig('upload', 'status')
     end
 
     def vimeo_video_transcode_status
-      vimeo_metadata.dig('transcode', 'status')
+      vimeo_metadata&.dig('transcode', 'status')
     end
 
     def vimeo_video_files(allowed_quality_names = %w(sd hd))
+      return [] unless (vimeo_metadata && vimeo_metadata['files'].to_a.size > 1)
+
       vimeo_metadata['files'].to_a
                              .select { |f| allowed_quality_names.include?(f['quality']) }
                              .sort_by { |f| f['size'] }
@@ -63,11 +65,11 @@ module Forest::Vimeo
     end
 
     def vimeo_video_default_thumbnail?
-      vimeo_metadata.dig('pictures', 'type') == 'default'
+      vimeo_metadata&.dig('pictures', 'type') == 'default'
     end
 
     def vimeo_video_thumbnails
-      vimeo_metadata.dig('pictures', 'sizes').to_a
+      vimeo_metadata&.dig('pictures', 'sizes').to_a
     end
 
     def vimeo_video_thumbnail(size = nil)

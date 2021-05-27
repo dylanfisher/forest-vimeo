@@ -64,12 +64,12 @@
                 <strong>Vimeo link</strong>: <%= link_to record.vimeo_video_link, record.vimeo_video_link, target: '_blank' %>
               </p>
             <% end %>
-            <% if record.vimeo_metadata['files'].present? %>
+            <% if record.vimeo_video_files.present? %>
               <p>
                 <strong>Direct file links</strong>: Use the direct file when embedding directly into an HTML video tag or an mp4 file is required.
               </p>
               <ul>
-                <% record.vimeo_metadata['files'].each do |file| %>
+                <% record.vimeo_video_files.each do |file| %>
                   <% next if file['quality'] == 'hls' %>
                   <% file_size = ", (#{file['size_short']})" if file['size_short'].present? %>
                   <li>

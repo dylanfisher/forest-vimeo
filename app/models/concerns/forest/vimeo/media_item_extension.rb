@@ -12,7 +12,7 @@ module Forest::Vimeo
     end
 
     def vimeo_video_id
-      vimeo_metadata['uri']&.match(/^\/videos\/(\d*)/).try(:[], 1)
+      vimeo_metadata && ['uri']&.match(/^\/videos\/(\d*)/).try(:[], 1)
     end
 
     def vimeo_user_id
@@ -31,12 +31,35 @@ module Forest::Vimeo
       vimeo_metadata['height']
     end
 
+    def vimeo_video_aspect_ratio(vimeo_video_default_width: 16, vimeo_video_default_height: 9)
+      w = vimeo_video_width.to_f > 0 ? vimeo_video_width.to_f : (vimeo_video_default_width.to_f * 100)
+      h = vimeo_video_height.to_f > 0 ? vimeo_video_height.to_f : (vimeo_video_default_height.to_f * 100)
+      h / w
+    end
+
     def vimeo_video_upload_status
       vimeo_metadata.dig('upload', 'status')
     end
 
     def vimeo_video_transcode_status
       vimeo_metadata.dig('transcode', 'status')
+    end
+
+    def vimeo_video_files(allowed_quality_names = %w(sd hd))
+      vimeo_metadata['files'].to_a
+                             .select { |f| allowed_quality_names.include?(f['quality']) }
+                             .sort_by { |f| f['size'] }
+    end
+
+    def vimeo_video_file_url
+      video_file_link = vimeo_video_files.last.try(:[], 'link')
+      video_file_link
+    end
+
+    def vimeo_video_file_url_mobile
+      video_file_link = vimeo_video_files.select { |f| f['quality'] == 'hd' }.first.presence ||
+                          vimeo_video_files.select { |f| f['quality'] == 'sd' }.last
+      video_file_link.try(:[], 'link')
     end
 
     def vimeo_video_default_thumbnail?
@@ -67,7 +90,7 @@ module Forest::Vimeo
     private
 
     def upload_to_vimeo
-      return unless attachment_changed?
+      return unless video? && attachment_changed?
 
       if saved_changes[:attachment_data].try(:[], 0).blank?
         Forest::Vimeo::VideoUploadJob.perform_later(id)
@@ -77,6 +100,8 @@ module Forest::Vimeo
     end
 
     def delete_from_vimeo
+      return unless video?
+
       Forest::Vimeo::VideoDestroyJob.perform_later(vimeo_video_id)
     end
   end

@@ -47,14 +47,21 @@ module Forest::Vimeo
       vimeo_metadata.dig('pictures', 'sizes').to_a
     end
 
-    def vimeo_video_thumbnail
+    def vimeo_video_thumbnail(size = nil)
       return [] unless vimeo_video_thumbnails.size > 1
 
-      largest_thumbnail = vimeo_video_thumbnails.find do |p|
-        p['width'] == vimeo_video_width && p['height'] == vimeo_video_height
-      end.presence
-      largest_thumbnail = vimeo_video_thumbnails.last if largest_thumbnail.blank?
-      largest_thumbnail.try(:[], 'link')
+      if size.to_s == 'thumb'
+        # For now we are assuming the thumbnails are ordered by smallest to largest
+        image_link = vimeo_video_thumbnails.first.try(:[], 'link')
+      else
+        largest_thumbnail = vimeo_video_thumbnails.find do |p|
+          p['width'] == vimeo_video_width && p['height'] == vimeo_video_height
+        end.presence
+        largest_thumbnail = vimeo_video_thumbnails.last if largest_thumbnail.blank?
+        image_link = largest_thumbnail.try(:[], 'link')
+      end
+
+      image_link
     end
 
     private

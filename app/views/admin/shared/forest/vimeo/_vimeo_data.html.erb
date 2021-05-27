@@ -10,7 +10,8 @@
             <div class="col">
               <div class="alert alert-warning" role="alert">
                 Vimeo has not finished transcoding this video yet. The CMS will automatically check the Vimeo transcoding status
-                every minute until the video is processed and ready to view.
+                every minute until the video is processed and ready to view. If you believe the video is done transcoding, but hasn't
+                updated in the CMS, press the "Refresh Vimeo Metadata" button below.
               </div>
             </div>
           </div>
@@ -40,10 +41,10 @@
                   <th>Is Playable</th>
                   <td><%= record.vimeo_metadata['is_playable'] %></td>
                 </tr>
-                <% if record.vimeo_metadata['parent_folder'].present? %>
+                <% if record.vimeo_metadata.dig('parent_folder', 'name').present? %>
                   <tr>
                     <th>Parent Folder</th>
-                    <td><%= record.vimeo_metadata['parent_folder'] %></td>
+                    <td><%= record.vimeo_metadata.dig('parent_folder', 'name') %></td>
                   </tr>
                 <% end %>
                 <% if record.vimeo_metadata['privacy'].present? %>

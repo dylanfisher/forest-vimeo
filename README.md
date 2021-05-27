@@ -15,6 +15,7 @@ Generate an authenticated personal acces token with the following scopes:
 - Upload
 - Delete
 - Video Files
+- Interact
 
 Add the following key/values to your Rails credentials file, or specify an environment variable to override.
 
@@ -31,6 +32,8 @@ class MediaItem < Forest::ApplicationRecord
   include Forest::Vimeo::MediaItemExtension
 end
 ```
+
+Now, any time a video is uploaded to the CMS via the media library, the video will be uploaded to Vimeo, stored in a folder named `Forest CMS`.
 
 ## Installation
 Add this line to your application's Gemfile:

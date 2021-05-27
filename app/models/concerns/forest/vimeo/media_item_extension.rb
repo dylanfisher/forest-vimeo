@@ -15,6 +15,10 @@ module Forest::Vimeo
       vimeo_metadata['uri']&.match(/^\/videos\/(\d*)/).try(:[], 1)
     end
 
+    def vimeo_user_id
+      vimeo_metadata.dig('user', 'uri')&.match(/^\/users\/(\d*)/).try(:[], 1)
+    end
+
     def vimeo_video_link
       vimeo_metadata['link']
     end
@@ -33,6 +37,10 @@ module Forest::Vimeo
 
     def vimeo_video_transcode_status
       vimeo_metadata.dig('transcode', 'status')
+    end
+
+    def vimeo_video_default_thumbnail?
+      vimeo_metadata.dig('pictures', 'type') == 'default'
     end
 
     def vimeo_video_thumbnails
@@ -54,7 +62,7 @@ module Forest::Vimeo
     def upload_to_vimeo
       return unless attachment_changed?
 
-      if attachment.blank?
+      if saved_changes[:attachment_data].try(:[], 0).blank?
         Forest::Vimeo::VideoUploadJob.perform_later(id)
       else
         Forest::Vimeo::VideoReplaceJob.perform_later(id)

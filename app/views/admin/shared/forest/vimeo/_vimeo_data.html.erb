@@ -1,21 +1,23 @@
 <div class="row small-gutters my-3">
   <div class="col-md-9">
     <div class="card">
-      <h1 class="h2 card-header">Vimeo Metadata</h1>
+      <h1 class="h2 card-header">
+        Vimeo Metadata
+      </h1>
       <div class="card-body">
-        <% if record.vimeo_video_transcode_status == 'in_progress' %>
+        <% if record.vimeo_video_transcode_status == 'in_progress' || record.vimeo_video_upload_status == 'in_progress' %>
           <div class="row small-gutters mb-3">
             <div class="col">
               <div class="alert alert-warning" role="alert">
                 Vimeo has not finished transcoding this video yet. The CMS will automatically check the Vimeo transcoding status
-                every 2 minutes until the video is processed and ready to view.
+                every minute until the video is processed and ready to view.
               </div>
             </div>
           </div>
         <% end %>
         <div class="row small-gutters">
           <div class="col-md-6">
-            <p>This media item has a corresponding Vimeo video*</p>
+            <p>This media item has a corresponding Vimeo video. If you delete this media item, the video will be automatically removed from Vimeo.</p>
             <table class="table table-sm">
               <tbody>
                 <tr>
@@ -44,19 +46,23 @@
                     <td><%= record.vimeo_metadata['parent_folder'] %></td>
                   </tr>
                 <% end %>
-                <tr>
-                  <th>Privacy</th>
-                  <td><%= record.vimeo_metadata['privacy'].collect { |x| "#{x[0]}: #{x[1]}" }.join('<br>').html_safe %></td>
-                </tr>
+                <% if record.vimeo_metadata['privacy'].present? %>
+                  <tr>
+                    <th>Privacy</th>
+                    <td><%= record.vimeo_metadata['privacy'].collect { |x| "#{x[0]}: #{x[1]}" }.join('<br>').html_safe %></td>
+                  </tr>
+                <% end %>
               </tbody>
             </table>
-            <p class="text-muted">*If you delete this media item, the video will be automatically removed from Vimeo.</p>
-            <%# TODO: add ability to fetch new status from Vimeo manually in case VideoPollJob fails %>
+            <%= link_to 'Refresh Vimeo Metadata', admin_media_item_vimeo_video_path(record, record.vimeo_video_id), class: 'btn btn-primary', method: 'patch' %>
+            <small class="form-text text-muted mt-2">If you find that a video is stuck on the transcoding screen in the CMS and believe this is an error, refresh the Vimeo metadata manually.</small>
           </div>
           <div class="col-md-6">
-            <p>
-              <strong>Vimeo link</strong>: <%= link_to record.vimeo_video_link, record.vimeo_video_link, target: '_blank' %>
-            </p>
+            <% if record.vimeo_video_link.present? %>
+              <p>
+                <strong>Vimeo link</strong>: <%= link_to record.vimeo_video_link, record.vimeo_video_link, target: '_blank' %>
+              </p>
+            <% end %>
             <% if record.vimeo_metadata['files'].present? %>
               <p>
                 <strong>Direct file links</strong>: Use the direct file when embedding directly into an HTML video tag or an mp4 file is required.

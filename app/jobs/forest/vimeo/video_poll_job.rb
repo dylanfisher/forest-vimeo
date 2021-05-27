@@ -17,7 +17,7 @@ module Forest::Vimeo
         transcode_status = video_metadata.dig('transcode', 'status')
 
         if transcode_status == 'in_progress'
-          Forest::Vimeo::VideoPollJob.set(wait: 2.minutes).perform_later(media_item.id)
+          Forest::Vimeo::VideoPollJob.set(wait: Forest::Vimeo::Video::POLL_TIME).perform_later(media_item.id)
         else
           media_item.update(vimeo_metadata: video_metadata.except(*Forest::Vimeo::Video::VIDEO_DATA_EXCLUDED_KEYS))
         end

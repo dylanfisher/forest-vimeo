@@ -19,6 +19,10 @@ module Forest::Vimeo
       vimeo_metadata['link']
     end
 
+    def vimeo_video_upload_status
+      vimeo_metadata.dig('upload', 'status')
+    end
+
     def vimeo_video_transcode_status
       vimeo_metadata.dig('transcode', 'status')
     end
@@ -28,7 +32,11 @@ module Forest::Vimeo
     def upload_to_vimeo
       return unless attachment_changed?
 
-      Forest::Vimeo::VideoUploadJob.perform_later(id)
+      if attachment.blank?
+        Forest::Vimeo::VideoUploadJob.perform_later(id)
+      else
+        Forest::Vimeo::VideoReplaceJob.perform_later(id)
+      end
     end
 
     def delete_from_vimeo

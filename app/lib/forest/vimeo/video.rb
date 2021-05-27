@@ -4,6 +4,7 @@ module Forest
   module Vimeo
     class Video
       VIDEO_DATA_EXCLUDED_KEYS = ['user', 'embed', 'stats', 'metadata', 'uploader', 'download']
+      POLL_TIME = 1.minute
 
       def self.get(vimeo_video_id)
         response = Faraday.get("https://api.vimeo.com/videos/#{vimeo_video_id}", nil, Forest::Vimeo::Client::HEADERS)
@@ -23,9 +24,6 @@ module Forest
 
         # TODO: move the file to a dedicated Forest folder after upload
         # https://developer.vimeo.com/api/reference/folders
-
-        # TODO: poll the video after intial upload and store final metadata
-        # after video files are processed.
 
         body = {
           "upload": {
@@ -54,7 +52,33 @@ module Forest
 
         media_item.update(vimeo_metadata: JSON.parse(response.body).except(*VIDEO_DATA_EXCLUDED_KEYS))
 
-        Forest::Vimeo::VideoPollJob.set(wait: 1.minutes).perform_later(media_item.id)
+        Forest::Vimeo::VideoPollJob.set(wait: POLL_TIME).perform_later(media_item.id)
+      end
+
+      def self.replace(media_item)
+        # Replace the source file of an existing video using the "pull" approach
+        # https://developer.vimeo.com/api/upload/videos#replacing-a-source-file
+
+        body = {
+          "file_name": media_item.title,
+          "upload": {
+            "approach": "pull",
+            "status": "in_progress",
+            "size": media_item.attachment_data.dig('metadata', 'size'),
+            "link": media_item.attachment_url
+          },
+        }.to_json
+
+        response = Faraday.post("https://api.vimeo.com/videos/#{media_item.vimeo_video_id}/versions", body, Forest::Vimeo::Client::HEADERS)
+
+        unless response.success?
+          Rails.logger.error { "[Forest][Error] Forest::Vimeo::Video replace failed\n#{response.status} #{response.reason_phrase}" }
+          return response
+        end
+
+        media_item.update(vimeo_metadata: JSON.parse(response.body).except(*VIDEO_DATA_EXCLUDED_KEYS))
+
+        Forest::Vimeo::VideoPollJob.set(wait: POLL_TIME).perform_later(media_item.id)
       end
 
       def self.destroy(vimeo_video_id)

@@ -4,6 +4,18 @@ Enable an application running Forest to sync video uploads to Vimeo.
 ## Usage
 This plugin requires at minimum a Vimeo pro account to enable direct video file access.
 
+In Vimeo, create a new [developer app](https://developer.vimeo.com/apps) named e.g. `Forest Video Integration`.
+
+Generate an authenticated personal acces token with the following scopes:
+
+- Public
+- Private
+- Create
+- Edit
+- Upload
+- Delete
+- Video Files
+
 Add the following key/values to your Rails credentials file, or specify an environment variable to override.
 
 The Vimeo [personal access token](https://developer.vimeo.com/apps/215549#personal_access_tokens)

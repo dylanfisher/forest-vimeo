@@ -77,6 +77,13 @@
                 <% end %>
               </ul>
             <% end %>
+            <% if record.vimeo_video_thumbnail.present? %>
+              <p>
+                <label><strong>Video thumbnail</strong></label>
+                <%= link_to image_tag(record.vimeo_video_thumbnail), record.vimeo_video_thumbnail, target: '_blank' %>
+                <small class="form-text text-muted mt-2">If you need to change the video thumbnail, first edit the <%= link_to 'video directly on Vimeo', record.vimeo_video_link, target: '_blank' %>, set the desired thumbnail, then press the "Refresh Vimeo Metadata" button.</small>
+              </p>
+            <% end %>
           </div>
         </div>
       </div>

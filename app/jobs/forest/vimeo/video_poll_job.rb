@@ -15,11 +15,28 @@ module Forest::Vimeo
         end
 
         transcode_status = video_metadata.dig('transcode', 'status')
+        time_ago_in_hours = (Time.current - media_item.created_at) / 3600
 
         if transcode_status == 'in_progress'
           Forest::Vimeo::VideoPollJob.set(wait: Forest::Vimeo::Video::POLL_TIME).perform_later(media_item.id)
         else
-          media_item.update(vimeo_metadata: video_metadata.except(*Forest::Vimeo::Video::VIDEO_DATA_EXCLUDED_KEYS))
+          media_item.assign_attributes(vimeo_metadata: video_metadata.except(*Forest::Vimeo::Video::VIDEO_DATA_EXCLUDED_KEYS))
+          media_item.save! if media_item.changed?
+
+          # If the media item was created less than 1 hour ago, or less than 24 hours ago,
+          # poll the video at a lower rate. Eventhough the transcode status is complete,
+          # some of the larger video sizes take longer.
+          if time_ago_in_hours < 0.5
+            wait_time = 5.minutes
+          elsif time_ago_in_hours < 1
+            wait_time = 10.minutes
+          elsif time_ago_in_hours < 24
+            wait_time = 60.minutes
+          end
+
+          if wait_time.present?
+            Forest::Vimeo::VideoPollJob.set(wait: wait_time).perform_later(media_item.id)
+          end
         end
       rescue Exception => e
         backtrace = e.backtrace.first(10).join("\n")

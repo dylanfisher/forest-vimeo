@@ -23,15 +23,16 @@ module Forest::Vimeo
           media_item.assign_attributes(vimeo_metadata: video_metadata.except(*Forest::Vimeo::Video::VIDEO_DATA_EXCLUDED_KEYS))
           media_item.save! if media_item.changed?
 
-          # If the media item was created less than 1 hour ago, or less than 24 hours ago,
-          # poll the video at a lower rate. Eventhough the transcode status is complete,
-          # some of the larger video sizes take longer.
+          # If the media item was created less than 24 hours ago, poll the video at a lower rate.
+          # Eventhough the transcode status is complete, some of the larger video sizes take longer.
           if time_ago_in_hours < 0.5
             wait_time = 5.minutes
           elsif time_ago_in_hours < 1
             wait_time = 10.minutes
-          elsif time_ago_in_hours < 24
+          elsif time_ago_in_hours < 12
             wait_time = 60.minutes
+          elsif time_ago_in_hours < 24
+            wait_time = 120.minutes
           end
 
           if wait_time.present?

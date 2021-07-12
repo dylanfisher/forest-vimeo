@@ -24,7 +24,7 @@ module Forest::Vimeo
           media_item.save! if media_item.changed?
 
           # If the media item was created less than 24 hours ago, poll the video at a lower rate.
-          # Eventhough the transcode status is complete, some of the larger video sizes take longer.
+          # Even though the transcode status is complete, some of the larger video sizes take longer.
           if time_ago_in_hours < 0.5
             wait_time = 5.minutes
           elsif time_ago_in_hours < 1

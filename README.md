@@ -12,10 +12,10 @@ Generate an authenticated personal acces token with the following scopes:
 - Private
 - Create
 - Edit
-- Upload
 - Delete
-- Video Files
 - Interact
+- Upload
+- Video Files
 
 Add the following key/values to your Rails credentials file, or specify an environment variable to override.
 

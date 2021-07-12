@@ -47,5 +47,10 @@ And then execute:
 $ bundle
 ```
 
+Import the Gem's migration files and migrate the database:
+```bash
+bundle exec rake railties:install:migrations
+```
+
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

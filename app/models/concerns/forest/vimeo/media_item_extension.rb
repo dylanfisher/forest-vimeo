@@ -5,6 +5,8 @@ module Forest::Vimeo
     included do
       after_save_commit :upload_to_vimeo
       after_destroy_commit :delete_from_vimeo
+
+      belongs_to :vimeo_video_thumbnail_override, class_name: 'MediaItem', optional: true
     end
 
     def vimeo_video?

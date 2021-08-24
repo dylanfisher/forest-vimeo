@@ -1,5 +1,5 @@
 <div class="row small-gutters my-3">
-  <div class="col-md-9">
+  <div class="col">
     <div class="card">
       <h1 class="h2 card-header">
         Vimeo Metadata
@@ -47,12 +47,6 @@
                     <td><%= record.vimeo_metadata.dig('parent_folder', 'name') %></td>
                   </tr>
                 <% end %>
-                <% if record.vimeo_metadata['privacy'].present? %>
-                  <tr>
-                    <th>Privacy</th>
-                    <td><%= record.vimeo_metadata['privacy'].collect { |x| "#{x[0]}: #{x[1]}" }.join('<br>').html_safe %></td>
-                  </tr>
-                <% end %>
               </tbody>
             </table>
             <%= link_to 'Refresh Vimeo Metadata', admin_media_item_vimeo_video_path(record, record.vimeo_video_id), class: 'btn btn-primary', method: 'patch' %>
@@ -78,12 +72,21 @@
                 <% end %>
               </ul>
             <% end %>
+          </div>
+        </div>
+        <hr>
+        <div class="row small-gutters mt-3">
+          <div class="col-md-6">
+            <label><strong>Thumbnail override</strong></label>
+            <%= f.association :vimeo_video_thumbnail_override, as: :image, label: false, hint: 'You may optionally upload a media item to override the thumbnail set within Vimeo.' %>
+          </div>
+          <div class="col-md-6">
             <% if record.vimeo_video_thumbnail.present? %>
-              <p>
-                <label><strong>Video thumbnail</strong></label>
+              <%= content_tag :p, style: "#{'opacity: 0.5;' if record.vimeo_video_thumbnail_override.present?}" do %>
+                <label><strong>Vimeo thumbnail<%= ' (inactive)' if record.vimeo_video_thumbnail_override.present? %></strong></label>
                 <%= link_to image_tag(record.vimeo_video_thumbnail), record.vimeo_video_thumbnail, target: '_blank' %>
-                <small class="form-text text-muted mt-2">If you need to change the video thumbnail, first edit the <%= link_to 'video directly on Vimeo', record.vimeo_video_link, target: '_blank' %>, set the desired thumbnail, then press the "Refresh Vimeo Metadata" button.</small>
-              </p>
+                <small class="form-text text-muted mt-2">If you prefer to change the video thumbnail directly on Vimeo, first edit the <%= link_to 'video directly on Vimeo', record.vimeo_video_link, target: '_blank' %>, set the desired thumbnail, then press the "Refresh Vimeo Metadata" button.</small>
+              <% end %>
             <% end %>
           </div>
         </div>

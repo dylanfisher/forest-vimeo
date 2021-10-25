@@ -54,3 +54,7 @@ bundle exec rake railties:install:migrations
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## TODO:
+
+- Prevent accidental deletion of Vimeo videos in development and staging environments.

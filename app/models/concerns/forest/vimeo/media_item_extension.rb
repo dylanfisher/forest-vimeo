@@ -95,7 +95,7 @@ module Forest::Vimeo
     private
 
     def upload_to_vimeo
-      return unless video? && attachment_changed?
+      return unless video? && (attachment_changed? || vimeo_metadata.blank?)
 
       if saved_changes[:attachment_data].try(:[], 0).blank?
         Forest::Vimeo::VideoUploadJob.perform_later(id)

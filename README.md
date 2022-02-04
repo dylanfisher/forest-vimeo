@@ -35,6 +35,12 @@ end
 
 Now, any time a video is uploaded to the CMS via the media library, the video will be uploaded to Vimeo and stored in a folder named `Forest CMS`.
 
+## Image inputs
+
+It may be helpful to limit the media item image input scope to just videos when launching the media item modal chooser.
+
+`<%= f.association :media_item, as: :image, scope: :videos %>`
+
 ## Installation
 Add this line to your application's Gemfile:
 

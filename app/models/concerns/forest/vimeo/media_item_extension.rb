@@ -75,6 +75,7 @@ module Forest::Vimeo
       vimeo_metadata&.dig('pictures', 'sizes').to_a
     end
 
+    # TODO: Store the thumbnails within the CMS so the image files are hosted on our platform
     def vimeo_video_thumbnail(size = nil)
       return [] unless vimeo_video_thumbnails.size > 1
 

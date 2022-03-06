@@ -2,6 +2,8 @@ class Admin::Vimeo::VideosController < Admin::ForestController
   before_action :set_media_item
 
   def update
+    authorize @media_item
+
     video_metadata = Forest::Vimeo::Video.get(params[:id])
 
     if video_metadata.try(:status) == 404

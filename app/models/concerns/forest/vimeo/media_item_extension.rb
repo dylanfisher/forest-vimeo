@@ -50,10 +50,19 @@ module Forest::Vimeo
     def vimeo_video_files(quality: %w(sd hd), public_name_prefix: %w(sd hd))
       return [] unless (vimeo_metadata && vimeo_metadata['files'].to_a.size > 1)
 
-      vimeo_metadata['files'].to_a
-                             .select { |f| quality.include?(f['quality'].downcase) }
-                             .select { |f| f['public_name'].downcase.start_with?(*public_name_prefix) }
-                             .sort_by { |f| f['size'] }
+      files = vimeo_metadata['files'].to_a
+                                     .select { |f| quality.include?(f['quality'].downcase) }
+                                     .select { |f| f['public_name'].downcase.start_with?(*public_name_prefix) }
+                                     .sort_by { |f| f['size'] }
+
+      if files.blank?
+        # If the files are blank, try checking for links without filtering by the `public_name` field
+        files = vimeo_metadata['files'].to_a
+                                       .select { |f| quality.include?(f['quality'].downcase) }
+                                       .sort_by { |f| f['size'] }
+      end
+
+      files
     end
 
     def vimeo_video_file_url

@@ -4,6 +4,7 @@ module Forest::Vimeo
 
     def perform(media_item_id)
       begin
+        # TODO: if media item is not found abort job
         media_item = MediaItem.find(media_item_id)
         vimeo_video_id = media_item.vimeo_video_id
 
@@ -20,6 +21,7 @@ module Forest::Vimeo
         if transcode_status == 'in_progress'
           Forest::Vimeo::VideoPollJob.set(wait: Forest::Vimeo::Video::POLL_TIME).perform_later(media_item.id)
         else
+          # TODO: figure out why this update always appears dirty. Do some of the attributes need to be ignored on subsequent polls?
           media_item.assign_attributes(vimeo_metadata: video_metadata.except(*Forest::Vimeo::Video::VIDEO_DATA_EXCLUDED_KEYS))
           media_item.save! if media_item.changed?
 

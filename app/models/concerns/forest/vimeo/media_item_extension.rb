@@ -102,6 +102,14 @@ module Forest::Vimeo
       image_link
     end
 
+    def vimeo_video_thumbnail_or_override_url
+      if vimeo_video_thumbnail_override.present?
+        vimeo_video_thumbnail_override.attachment_url(:large)
+      else
+        vimeo_video_thumbnail
+      end
+    end
+
     private
 
     def upload_to_vimeo
